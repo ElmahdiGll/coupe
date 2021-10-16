@@ -1,0 +1,283 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+// ---- structure ----
+typedef struct equipe{
+    char nom[15];
+    int nbrpoint;
+    int but_marque;
+    int but_encaisse;
+    int nbr_jaune;
+    int nbr_rouge;
+    int pourc_but;
+}equipe;
+typedef struct equip{
+    char nom[15];
+}equip;
+
+// ---- Fontions ----
+equipe **trier(equipe **)
+void affiche(equipe **)
+void echange(equipe *,equipe *);
+equipe **remplir();
+equip *quart_finale(equipe **);
+equip *demi_finale(equip *);
+char *win(equip *);
+
+
+// ---- echanger les places de 2 equipes ----
+void echange(equipe *t1,equipe *t2){
+    equipe *e;
+    e=(equipe  *)malloc(sizeof(equipe));
+    strcpy(e->nom,t1->nom);
+    e->nbrpoint=t1->nbrpoint;
+    e->but_marque=t1->but_marque;
+    e->but_encaisse=t1->but_encaisse;
+    e->nbr_jaune=t1->nbr_jaune;
+    e->nbr_rouge=t1->nbr_rouge;
+    e->pourc_but=t1->pourc_but;
+    strcpy(t1->nom,t2->nom);
+    t1->nbrpoint=t2->nbrpoint;
+    t1->but_marque=t2->but_marque;
+    t1->but_encaisse=t2->but_encaisse;
+    t1->nbr_jaune=t2->nbr_jaune;
+    t1->nbr_rouge=t2->nbr_rouge;
+    t1->pourc_but=t2->pourc_but;
+    strcpy(t2->nom,e->nom);
+    t2->nbrpoint=e->nbrpoint;
+    t2->but_marque=e->but_marque;
+    t2->but_encaisse=e->but_encaisse;
+    t2->nbr_jaune=e->nbr_jaune;
+    t2->nbr_rouge=e->nbr_rouge;
+    t2->pourc_but=e->pourc_but;
+}
+
+// ---- trier la groupes ----
+equipe **trier(equipe **tab){
+    equipe e;
+    int i,j,h;
+    for(i=0;i<4;i++){
+        for(j=0;j<6;j++){
+            for(h=0;h<6;h++){
+                if(tab[i][j].nbrpoint>tab[i][h].nbrpoint)
+                    echange(*(tab+i)+j,*(tab+i)+h);
+            }
+        }
+    }
+    for(i=0;i<4;i++){
+        for(j=0;j<6;j++){
+            if(tab[i][j].nbrpoint==tab[i][j+1].nbrpoint){
+                if(tab[i][j].pourc_but<tab[i][j+1].pourc_but){
+                    echange(*(tab+i+j),*(tab+i)+j+1);
+                }
+                else if(tab[i][j].pourc_but==tab[i][j+1].pourc_but){
+                    if(tab[i][j].nbr_jaune>tab[i][j+1].nbr_jaune)
+                        echange(*(tab+i)+j,*(tab+i)+j+1);
+                    else if(tab[i][j].nbr_jaune==tab[i][j+1].nbr_jaune){
+                        if(tab[i][j].nbr_rouge>tab[i][j+1].nbr_rouge)
+                            echange(*(tab+i+j),*(tab+i)+j+1);
+                    }
+                }
+            }
+        }
+    }
+    return tab;
+}
+
+// ---- afficher les groupes -----
+void affiche(equipe **tab){
+    int i,j;
+    for(i=0;i<4;i++){
+        printf("\t\t\t\t\t\t\t\t\t\tGROUPE %c\n",'A'+i);
+        printf("\t\t\t---------------------------------------------------------------------------------------------------------\n");
+        printf("\t\t\t|      equpie        point     but marque      but encaisse     jaune        rouge      pourcet but   \n");
+        for(j=0;j<6;j++){
+        printf("\t\t\t|        %s            %d          %d              %d               %d           %d            %d       \n",tab[i][j].nom,tab[i][j].nbrpoint,tab[i][j].but_marque,tab[i][j].but_encaisse,tab[i][j].nbr_jaune,tab[i][j].nbr_rouge,tab[i][j].pourc_but);
+        }
+        printf("\t\t\t---------------------------------------------------------------------------------------------------------\n");
+        printf("\t\t\t\t\t\t\tcontinue  .  .  .  .");getch();
+    }
+}
+
+// ---- remplir les équipes ----
+equipe **remplir(){
+    equipe **tab;
+    int i,j,h;
+    int a,b,c,d;
+    tab=(equipe **)malloc(4*sizeof(equipe*));
+    for(i=0;i<4;i++)
+        *tab=(equipe *)malloc(6*sizeof(equipe));
+    for(i=0;i<4;i++){
+        printf("\t\t---------------------gruope %c-----------------------\n",'A'+i);
+        for(j=0;j<6;j++){
+            printf("\tdonner le nom de %d equipe : ",j+1);
+            scanf("%s",tab[i][j].nom);
+            tab[i][j].nbrpoint=0;
+            tab[i][j].but_marque=0;
+            tab[i][j].but_encaisse=0;
+            tab[i][j].nbr_jaune=0;
+            tab[i][j].nbr_rouge=0;
+        }
+        system("CLS");
+    }
+    for(i=0;i<4;i++){
+        printf("\t\t---------------------gruope %c-----------------------\n",'A'+i);
+        for(j=0;j<5;j++){
+            for(h=j+1;h<6;h++){
+                printf("\t\t--------------%s VS %s---------------\n",tab[i][j].nom,tab[i][h].nom);
+                printf("\t\tdonner le resultat en forme %s-%s : ",tab[i][j].nom,tab[i][h].nom);
+                scanf("%d-%d",&a,&b);
+                printf("\tdonner le nombre de carte jaune de ce match pour %s : ",tab[i][j].nom);
+                scanf("%d",&c);
+                printf("\tdonner le nombre de carte rouge de ce match pour %s : ",tab[i][j].nom);
+                scanf("%d",&d);
+                tab[i][j].but_marque+=a;
+                tab[i][j].but_encaisse+=b;
+                tab[i][j].nbr_jaune+=c;
+                tab[i][j].nbr_rouge+=d;
+                printf("\tdonner le nombre de carte jaune de ce match pour %s : ",tab[i][h].nom);
+                scanf("%d",&c);
+                printf("\tdonner le nombre de carte rouge de ce match pour %s : ",tab[i][h].nom);
+                scanf("%d",&d);
+                tab[i][h].nbr_jaune+=c;
+                tab[i][h].nbr_rouge+=d;
+                tab[i][h].but_marque+=b;
+                tab[i][h].but_encaisse+=a;
+                if(a>b)  tab[i][j].nbrpoint+=3;
+                else if(a<b)  tab[i][h].nbrpoint+=3;
+                else{
+                    tab[i][j].nbrpoint+=1;
+                    tab[i][h].nbrpoint+=1;
+                }
+            }
+        }
+        printf("\t\t\t\t\t\t\tgroupe suivant  .  .  .  .");getch();
+        system("CLS");
+    }
+    for(i=0;i<4;i++){
+        for(j=0;j<6;j++){
+            tab[i][j].pourc_but=tab[i][j].but_marque-tab[i][j].but_encaisse;
+        }
+    }
+    return tab;
+}
+
+// ---quart finale ----
+equip *quart_finale(equipe **tab){
+    equip *demi=(equip *)malloc(4*sizeof(equip));
+    int i,j,a,b,c,d;
+    equip **quart;
+    quart=(equip **)malloc(4*sizeof(equip *));
+    for(i=0;i<4;i++)
+        *quart=(equip *)malloc(2*sizeof(equip ));
+    for(i=0;i<4;i++){
+        for(j=0;j<2;j++)
+            strcpy(quart[i][j].nom,tab[i][j].nom);
+    }
+    printf("\t-----------------------------quart finale-----------------------------\n");
+    for(i=0;i<3;i+2){
+        for(j=0;j<2;j++){
+            printf("\t\t--------------%s VS %s---------------\n",quart[i][j].nom,quart[i+1][j+1].nom);
+            printf("\t\tdonner le resultat en forme %s-%s : ",quart[i][j].nom,quart[i+1][j+1].nom);
+            scanf("%d-%d",&a,&b);
+            if(a>b)
+                strcpy(demi[i].nom,quart[i][j].nom);
+            else if(a<b)
+                strcpy(demi[i].nom,quart[i+1][j+1].nom);
+            else{
+                printf("\tdonner le resultat de penalties  en forme %s-%s : ",quart[i][j].nom,quart[i+1][j+1].nom);
+                scanf("%d-%d",&c,&d);
+                if(c>d)
+                    strcpy(demi[i].nom,quart[i][j].nom);
+                else if(c<d)
+                    strcpy(demi[i].nom,quart[i+1][j+1].nom);
+            }
+            system("CLS");
+            printf("\t\t--------------%s VS %s---------------\n",quart[i][j+1].nom,quart[i+1][j].nom);
+            printf("\t\tdonner le resultat en forme %s-%s : ",quart[i][j+1].nom,quart[i+1][j].nom);
+            scanf("%d-%d",&a,&b);
+            if(a>b)
+                strcpy(demi[i+1].nom,quart[i][j+1].nom);
+            else if(a<b)
+                strcpy(demi[i+1].nom,quart[i+1][j].nom);
+            else{
+                printf("\tdonner le resultat de penalties  en forme %s-%s : ",quart[i][j].nom,quart[i+1][j+1].nom);
+                scanf("%d-%d",&c,&d);
+                if(c>d)
+                    strcpy(demi[i+1].nom,quart[i+1][j].nom);
+                else if(c<d)
+                    strcpy(demi[i+1].nom,quart[i+1][j].nom);
+            }
+            system("CLS");
+        }
+    }
+    return demi;
+}
+
+// ---- demi final ----
+equip *demi_finale(equip *demi){
+    int i,j,a,b,c,d;
+    equip *finale=(equip *)malloc(2*sizeof(equip));
+    printf("\t-----------------------------demie finale-----------------------------\n");
+    for(i=0;i<3;i+2){
+        printf("\t\t--------------%s VS %s----------------\n",demi[i].nom,demi[i+1].nom);
+        printf("\t\tdonner le resultat en forme %s-%s : ",demi[i].nom,demi[i+1].nom);
+        scanf("%d-%d",&a,&b);
+        if(a>b)
+            strcpy(finale[i].nom,demi[i].nom);
+        else if(a<b)
+            strcpy(finale[i].nom,demi[i+1].nom);
+        else{
+            printf("\tdonner le resultat de penalties  en forme %s-%s : ",demi[i].nom,demi[i+1].nom);
+            scanf("%d-%d",&c,&d);
+            if(c>d)
+                strcpy(finale[i].nom,demi[i].nom);
+            else if(c<d)
+                strcpy(finale[i].nom,demi[i+1].nom);
+        }
+        system("CLS");
+    }
+    return finale;
+}
+
+// ---- finale ----
+char *win(equip *finale){
+    int a,b,c,d;
+    char *winner=(char *)malloc(15);
+    printf("\t-----------------------------finale-----------------------------\n");
+    printf("\t\t--------------%s VS %s----------------\n",finale[0].nom,finale[1].nom);
+    printf("\t\tdonner le resultat en forme %s-%s : ",finale[0].nom,finale[1].nom);
+    scanf("%d-%d",&a,&b);
+    if(a>b)
+        strcpy(winner,finale[0].nom);
+    else if(a<b)
+        strcpy(winner,finale[1].nom);
+    else{
+        printf("\tdonner le resultat de penalties  en forme %s-%s : ",finale[0].nom,finale[1].nom);
+        scanf("%d-%d",&c,&d);
+        if(c>d)
+            strcpy(winner,finale[0].nom);
+        else if(c<d)
+            strcpy(winner,finale[1].nom);
+    }
+    system("CLS");
+    return winner;
+}
+
+// ---- fonction main ----
+int main(){
+    int i,j,h;
+    int a,b,c,d;
+    equipe **tab=remplir();;
+    equip *demi;
+    equip *finale;
+    char *gagnante;
+    tab=trier(tab);
+    affiche(tab);
+    demi=quart_finale(tab);
+    finale=demi_finale(demi);
+    gagnante=win(finale);
+    printf("\tl equipe gagnante est : %s\n",gagnante);
+    return 0;
+}
